@@ -5,17 +5,19 @@ import matplotlib.pyplot as plt
 import math
 '''Inputs'''
 
-S=32.79364849
+S=32.79364849 #Total Surface
 A = 6 #Aspect ratio
 b = np.sqrt(S*A) # outer wing wingspan [m]
-V  = 40000 # Battery Volume [m^3]
+V_bat  = 400 # Battery Volume [m^3]
+V_body = 100 # Battery Volume [m^3]
+V_tot = V_bat + V_body #Total Volume [m^3]
 
 
-taper_inner=0.4
+
 taper_outer=0.267354977
 sweep_inner=np.rad2deg(38)
 sweep_outer=np.rad2deg(38)
-b_inner=2
+b_inner=4
 b_outer=b-b_inner
 ''' Arifoil Properties '''
 
@@ -71,14 +73,17 @@ plt.show()
 print(negative_surface)
 print(postive_surface)
 
-Area= (negative_surface+postive_surface)
+Area_outer= (negative_surface+postive_surface)
+Area_inner = Area_outer
 print('Expected volume available for bateries : {} m^2 per chord of 1m'.format(S))
 
-
-
+def f(x): #In here x is the inner taper ratio
+    Cri = 2 * S / ((taper_outer*x+x)*b_outer+(x+1)*b_inner)
+    y=-V_tot + 2*Area_inner * (x**2*b_inner/2+0.5*(1-x)*x*b_inner+1/6*(1-x)**2*b_inner)*Cri**2+ \
+      2*Area_outer * (taper_outer**2*b_outer/2+0.5*(1-taper_outer)*taper_outer*b_outer+1/6*(1-taper_outer)**2*b_outer)*x**2*Cri**2
+    return y
+print(f(0.1))
 '''Calculations'''
-#We decided that all the batteries are gonna be in the wings, so we find the root chord of the outer wing in function of the battery volume
 
-cr = math.sqrt(V/(2*Area*(taper_outer**2*b_outer/2 + 0.5*(1 - taper_outer)*taper_outer*b_outer + 1/6 * (1-taper_outer)**2*b_outer)))
-print(cr)
+
 
