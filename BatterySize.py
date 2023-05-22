@@ -23,8 +23,8 @@ b_outer=b-b_inner
 ''' Arifoil Properties '''
 
 # Read the .dat file
-file_path_inner = "MH 91  14.98%.dat"
-file_path_outer = "MH 91  14.98%.dat"
+file_path_inner = ".\Airfoil_dat\MH 91  14.98%.dat"
+file_path_outer = ".\Airfoil_dat\MH 91  14.98%.dat"
 
 def airfoilvolume(file_path):
     # Initialize empty arrays for positive and negative values
