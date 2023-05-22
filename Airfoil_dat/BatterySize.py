@@ -85,8 +85,7 @@ print('Expected volume available for bateries : {} m^2 per chord of 1m'.format(A
 
 def f(x): #In here x is the inner taper ratio
     Cri = 2 * S / ((taper_outer*x+x)*b_outer+(x+1)*b_inner)
-    y=-V_tot + 2*Area_inner * (x**2*b_inner/2+0.5*(1-x)*x*b_inner+1/6*(1-x)**2*b_inner)*Cri**2+ \
-      2*Area_outer * (taper_outer**2*b_outer/2+0.5*(1-taper_outer)*taper_outer*b_outer+1/6*(1-taper_outer)**2*b_outer)*x**2*Cri**2
+    y=-V_tot + 2*Area_inner * (x**2*b_inner/2+0.5*(1-x)*x*b_inner+1/6*(1-x)**2*b_inner)*Cri**2+ 2*Area_outer * (taper_outer**2*b_outer/2+0.5*(1-taper_outer)*taper_outer*b_outer+1/6*(1-taper_outer)**2*b_outer)*x**2*Cri**2
     return y
 print(f(0.1))
 
