@@ -15,8 +15,8 @@ V_tot = V_bat + V_body #Total Volume [m^3]
 
 
 taper_outer=0.267354977
-sweep_inner=np.rad2deg(38)
-sweep_outer=np.rad2deg(38)
+sweep_inner=np.deg2rad(38)
+sweep_outer=np.deg2rad(38)
 b_inner=4
 b_outer=b-b_inner
 
