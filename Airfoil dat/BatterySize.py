@@ -4,17 +4,19 @@ import numpy as np
 import matplotlib.pyplot as plt
 '''Inputs'''
 
+S=32.79364849
 A = 6 #Aspect ratio
 taper0 = 0.4 #Ratio tip over chord
-b0 = 40 # outer wing wingspan [m]
+b = np.sqrt(S*A) # outer wing wingspan [m]
 V  = 40000 # Battery Volume [m^3]
 
 
 taper_inner=0.4
-taper_outer=0.4
+taper_outer=0.267354977
 sweep_inner=np.rad2deg(38)
 sweep_outer=np.rad2deg(38)
 b_inner=2
+b_outer=b-b_inner
 ''' Arifoil Properties '''
 S = 40
 
