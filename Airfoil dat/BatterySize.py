@@ -18,7 +18,6 @@ sweep_outer=np.rad2deg(38)
 b_inner=2
 b_outer=b-b_inner
 ''' Arifoil Properties '''
-S = 40
 
 file_path = "MH 91  14.98%.dat"  # Replace with the path to your .dat file
 
