@@ -9,6 +9,12 @@ taper0 = 0.4 #Ratio tip over chord
 b0 = 40 # outer wing wingspan [m]
 V  = 40000 # Battery Volume [m^3]
 
+
+taper_inner=0.4
+taper_outer=0.4
+sweep_inner=np.rad2deg(38)
+sweep_outer=np.rad2deg(38)
+b_inner=2
 ''' Arifoil Properties '''
 S = 40
 
@@ -71,6 +77,8 @@ print(postive_surface)
 
 S= (negative_surface+postive_surface)
 print('Expected volume available for bateries : {} m^2 per chord of 1m'.format(S))
+
+
 
 '''Calculations'''
 
