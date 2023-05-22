@@ -6,10 +6,10 @@ import math
 '''Inputs'''
 
 S=32.79364849 #Total Surface
-A = 6 #Aspect ratio
-b = np.sqrt(S*A) # outer wing wingspan [m]
-V_bat  = 400 # Battery Volume [m^3]
-V_body = 100 # Battery Volume [m^3]
+AR = 6 #Aspect ratio
+b = np.sqrt(S*AR) # outer wing wingspan [m]
+V_bat  = 4 # Battery Volume [m^3]
+V_body = 2 # Battery Volume [m^3]
 V_tot = V_bat + V_body #Total Volume [m^3]
 
 
@@ -21,60 +21,67 @@ b_inner=4
 b_outer=b-b_inner
 
 ''' Arifoil Properties '''
-# Read the .dat file
-file_path = "MH 91  14.98%.dat"  # Replace with the path to your .dat file
-
-# Initialize empty arrays for positive and negative values
-positive_column1 = []
-positive_column2 = []
-negative_column1 = []
-negative_column2 = []
 
 # Read the .dat file
-with open(file_path, 'r') as file:
-    for line in file:
-        # Remove leading/trailing whitespaces and split the line by spaces
-        data = line.strip().split()
-        if len(data) >= 2:  # Ensure the line has at least two columns
-            value1 = float(data[0])
-            value2 = float(data[1])
-            if 0.15 <= value1 <= 0.55:
-                if value2 >= 0:
-                    positive_column1.append(value1)
-                    positive_column2.append(value2)
-                else:
-                    negative_column1.append(value1)
-                    negative_column2.append(value2)
+file_path_inner = "MH 91  14.98%.dat"
+file_path_outer = "MH 91  14.98%.dat"
 
-# Print the positive and negative arrays
-print("Positive Column 1:", positive_column1)
-print("Positive Column 2:", positive_column2)
-print("Negative Column 1:", negative_column1)
-print("Negative Column 2:", negative_column2)
+def airfoilvolume(file_path):
+    # Initialize empty arrays for positive and negative values
+    positive_column1 = []
+    positive_column2 = []
+    negative_column1 = []
+    negative_column2 = []
+
+    # Read the .dat file
+    with open(file_path, 'r') as file:
+        for line in file:
+            # Remove leading/trailing whitespaces and split the line by spaces
+            data = line.strip().split()
+            if len(data) >= 2:  # Ensure the line has at least two columns
+                try:
+                    value1 = float(data[0])
+                    value2 = float(data[1])
+                    if 0.15 <= value1 <= 0.55:
+                        if value2 >= 0:
+                            positive_column1.append(value1)
+                            positive_column2.append(value2)
+                        else:
+                            negative_column1.append(value1)
+                            negative_column2.append(value2)
+                except ValueError:
+                    continue
+    # Print the positive and negative arrays
+    print("Positive Column 1:", positive_column1)
+    print("Positive Column 2:", positive_column2)
+    print("Negative Column 1:", negative_column1)
+    print("Negative Column 2:", negative_column2)
 
 
-# Compute the surface using numpy
-postive_surface = -np.trapz(positive_column2, positive_column1)
-negative_surface = -np.trapz(negative_column2, negative_column1)
+    # Compute the surface using numpy
+    postive_surface = -np.trapz(positive_column2, positive_column1)
+    negative_surface = -np.trapz(negative_column2, negative_column1)
 
-# Plot the surface
-plt.plot(positive_column1, positive_column2, label='Positive')
-plt.plot(negative_column1, negative_column2, label='Negative')
-plt.xlabel('Column 1 (X-axis)')
-plt.ylabel('Column 2 (Y-axis)')
-plt.title('Surface Plot')
-plt.grid(True)
-ax = plt.gca()
-ax.set_aspect('equal', adjustable='box')
-plt.draw()
-plt.show()
+    # Plot the surface
+    plt.plot(positive_column1, positive_column2, label='Positive')
+    plt.plot(negative_column1, negative_column2, label='Negative')
+    plt.xlabel('Column 1 (X-axis)')
+    plt.ylabel('Column 2 (Y-axis)')
+    plt.title('Surface Plot')
+    plt.grid(True)
+    ax = plt.gca()
+    ax.set_aspect('equal', adjustable='box')
+    plt.draw()
+    plt.show()
 
-print(negative_surface)
-print(postive_surface)
+    print(negative_surface)
+    print(postive_surface)
+    Area = (negative_surface+postive_surface)
+    return Area
 
-Area_outer= (negative_surface+postive_surface)
-Area_inner = Area_outer
-print('Expected volume available for bateries : {} m^2 per chord of 1m'.format(S))
+Area_inner = airfoilvolume(file_path_inner)
+Area_outer = airfoilvolume(file_path_outer)
+print('Expected volume available for bateries : {} m^2 per chord of 1m'.format(Area_outer))
 
 def f(x): #In here x is the inner taper ratio
     Cri = 2 * S / ((taper_outer*x+x)*b_outer+(x+1)*b_inner)
@@ -120,12 +127,12 @@ def newtonRaphson(f, x0, e, N, h, relax):
 
     if flag == 1:
         print('\nRequired root is: %0.8f' % x1)
-        return x0, i
+        return x0, i, x1
     else:
         print('\nNot Convergent.')
         return 1000, i
 
-
-
-
+x1 = newtonRaphson(f,0.4,0.01,1000, 0.01, 0)[2]
+Cri =  2 * S / ((taper_outer*x1+x1)*b_outer+(x1+1)*b_inner)
+print(Cri)
 
