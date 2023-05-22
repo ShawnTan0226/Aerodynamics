@@ -2,11 +2,11 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
+import math
 '''Inputs'''
 
 S=32.79364849
 A = 6 #Aspect ratio
-taper0 = 0.4 #Ratio tip over chord
 b = np.sqrt(S*A) # outer wing wingspan [m]
 V  = 40000 # Battery Volume [m^3]
 
@@ -19,11 +19,6 @@ b_inner=2
 b_outer=b-b_inner
 ''' Arifoil Properties '''
 
-file_path = "MH 91  14.98%.dat"  # Replace with the path to your .dat file
-
-# Initialize empty arrays
-column1 = []
-column2 = []
 
 # Read the .dat file
 file_path = "MH 91  14.98%.dat"  # Replace with the path to your .dat file
@@ -76,11 +71,14 @@ plt.show()
 print(negative_surface)
 print(postive_surface)
 
-S= (negative_surface+postive_surface)
+Area= (negative_surface+postive_surface)
 print('Expected volume available for bateries : {} m^2 per chord of 1m'.format(S))
 
 
 
 '''Calculations'''
+#We decided that all the batteries are gonna be in the wings, so we find the root chord of the outer wing in function of the battery volume
 
+cr = math.sqrt(V/(2*Area*(taper_outer**2*b_outer/2 + 0.5*(1 - taper_outer)*taper_outer*b_outer + 1/6 * (1-taper_outer)**2*b_outer)))
+print(cr)
 
