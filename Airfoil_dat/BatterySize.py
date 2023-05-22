@@ -140,7 +140,7 @@ print("b_inner: ",b_inner)
 print("cr_inner: ",Cri)
 print("cr_outer: ",x1*Cri)
 print("ct_outer: ",x1*Cri*taper_outer)
-print("Offset inner: ",b_inner*0.25-b_outer*0.25 + np.tan(sweep_inner)*b_inner/2)
+print("Offset inner: ",Cri*0.25-x1*Cri*0.25 + np.tan(sweep_inner)*b_inner/2)
 print("Offset outer: ",Cri*0.25-x1*Cri*0.25 + np.tan(sweep_outer)*b_outer/2+np.tan(sweep_inner)*b_inner/2-x1*Cri*taper_outer*0.25+x1*Cri*0.25 )
 
 
