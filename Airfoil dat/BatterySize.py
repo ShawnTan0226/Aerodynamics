@@ -19,47 +19,8 @@ sweep_inner=np.rad2deg(38)
 sweep_outer=np.rad2deg(38)
 b_inner=4
 b_outer=b-b_inner
-''' Arifoil Properties '''
-def gradient(f,x,step):
-    return (f(x+step)-f(x-step))/(step*2)
 
-def newtonRaphson(f,x0,e,N,h,relax):
-    print('\n\n*** NEWTON RAPHSON METHOD IMPLEMENTATION ***')
-    i=0
-    step = 1
-    flag = 1
-    condition = True
-    while condition:
-        # if g(f,x0,h) == 0.0:
-        #     print('Divide by zero error!')
-        #     break
-        print('x0---',x0)
-        print('value---',f(x0))
-        print('grad---',gradient(f,x0,h))
-        x1 = x0*relax + (x0-f(x0)/(gradient(f,x0,h)))*(1-relax)
-        # print('Iteration-%d, x1 = %0.6f and f(x1) = %0.6f' % (step, x1, f(x1)))
-        x0 = x1
-        step = step + 1
-        newvalue=f(x1) 
-        print(newvalue)
-        # if g(f,buildingno,x0,h)<0:
-        #     x1=x1/relax
-        
-        if  abs(newvalue)< e:
-            condition=False
-        if step > N:
-            print('\nNot Convergent.')
-            flag=2
-            condition=False
-        i+=1
-        print('x1---',x1)
-    
-    if flag==1:
-        print('\nRequired root is: %0.8f' % x1)
-        return x0,i
-    else:
-        print('\nNot Convergent.')
-        return 1000,i
+''' Arifoil Properties '''
 # Read the .dat file
 file_path = "MH 91  14.98%.dat"  # Replace with the path to your .dat file
 
@@ -121,8 +82,49 @@ def f(x): #In here x is the inner taper ratio
       2*Area_outer * (taper_outer**2*b_outer/2+0.5*(1-taper_outer)*taper_outer*b_outer+1/6*(1-taper_outer)**2*b_outer)*x**2*Cri**2
     return y
 print(f(0.1))
-'''Calculations'''
 
+
+def gradient(f, x, step):
+    return (f(x + step) - f(x - step)) / (step * 2)
+
+
+def newtonRaphson(f, x0, e, N, h, relax):
+    print('\n\n*** NEWTON RAPHSON METHOD IMPLEMENTATION ***')
+    i = 0
+    step = 1
+    flag = 1
+    condition = True
+    while condition:
+        # if g(f,x0,h) == 0.0:
+        #     print('Divide by zero error!')
+        #     break
+        print('x0---', x0)
+        print('value---', f(x0))
+        print('grad---', gradient(f, x0, h))
+        x1 = x0 * relax + (x0 - f(x0) / (gradient(f, x0, h))) * (1 - relax)
+        # print('Iteration-%d, x1 = %0.6f and f(x1) = %0.6f' % (step, x1, f(x1)))
+        x0 = x1
+        step = step + 1
+        newvalue = f(x1)
+        print(newvalue)
+        # if g(f,buildingno,x0,h)<0:
+        #     x1=x1/relax
+
+        if abs(newvalue) < e:
+            condition = False
+        if step > N:
+            print('\nNot Convergent.')
+            flag = 2
+            condition = False
+        i += 1
+        print('x1---', x1)
+
+    if flag == 1:
+        print('\nRequired root is: %0.8f' % x1)
+        return x0, i
+    else:
+        print('\nNot Convergent.')
+        return 1000, i
 
 
 
