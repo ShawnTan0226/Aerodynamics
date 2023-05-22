@@ -5,10 +5,10 @@ import matplotlib.pyplot as plt
 import math
 '''Inputs'''
 
-S=32.79364849 #Total Surface
+S=50 #Total Surface
 AR = 6 #Aspect ratio
 b = np.sqrt(S*AR) # outer wing wingspan [m]
-V_bat  = 4 # Battery Volume [m^3]
+V_bat  = 7 # Battery Volume [m^3]
 V_body = 2 # Battery Volume [m^3]
 V_tot = V_bat + V_body #Total Volume [m^3]
 
@@ -135,5 +135,11 @@ def newtonRaphson(f, x0, e, N, h, relax):
 
 x1 = newtonRaphson(f,0.4,0.01,1000, 0.01, 0)[2]
 Cri =  2 * S / ((taper_outer*x1+x1)*b_outer+(x1+1)*b_inner)
-print(Cri)
+
+print("b_outer: ",b_outer)
+print("b_inner: ",b_inner)
+print("cr_inner: ",Cri)
+print("cr_outer: ",x1*Cri)
+print("ct_outer: ",x1*Cri*taper_outer)
+
 
