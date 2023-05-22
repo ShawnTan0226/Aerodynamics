@@ -1,5 +1,4 @@
 import math
-
 # Input parameters
 taper_ratio = float(input("Enter the taper ratio: "))
 aspect_ratio = float(input("Enter the aspect ratio: "))
