@@ -6,12 +6,12 @@ import math
 '''Inputs'''
 
 g=9.81 #Gravitational acceleration [m/s^2]
-MTOW= 20320 #Maximum Take Off Weight [kg]
-Wing_loading= 2549 #Wing Loading [N/m^2]
+MTOW= 19902 #Maximum Take Off Weight [kg]
+Wing_loading= 2409 #Wing Loading [N/m^2]
 S=MTOW*g/Wing_loading #Total Surface
 AR = 6 #Aspect ratio
 b = np.sqrt(S*AR) # outer wing wingspan [m]
-V_bat  = 7 # Battery Volume [m^3]
+V_bat  = 7.5 # Battery Volume [m^3]
 V_body = 2 # Battery Volume [m^3]
 V_tot = V_bat + V_body #Total Volume [m^3]
 
@@ -20,7 +20,7 @@ V_tot = V_bat + V_body #Total Volume [m^3]
 taper_outer=0.267354977
 sweep_inner=np.deg2rad(38)
 sweep_outer=np.deg2rad(38)
-b_inner=4
+b_inner=np.arange(0.1,0.65,0.05)*b
 b_outer=b-b_inner
 
 ''' Arifoil Properties '''
@@ -66,15 +66,15 @@ def airfoilvolume(file_path):
     negative_surface = -np.trapz(negative_column2, negative_column1)
 
     # Plot the surface
-    plt.plot(positive_column1, positive_column2, label='Positive')
-    plt.plot(negative_column1, negative_column2, label='Negative')
-    plt.xlabel('Column 1 (X-axis)')
-    plt.ylabel('Column 2 (Y-axis)')
-    plt.title('Surface Plot')
-    plt.grid(True)
-    ax = plt.gca()
-    ax.set_aspect('equal', adjustable='box')
-    plt.draw()
+    # plt.plot(positive_column1, positive_column2, label='Positive')
+    # plt.plot(negative_column1, negative_column2, label='Negative')
+    # plt.xlabel('Column 1 (X-axis)')
+    # plt.ylabel('Column 2 (Y-axis)')
+    # plt.title('Surface Plot')
+    # plt.grid(True)
+    # ax = plt.gca()
+    # ax.set_aspect('equal', adjustable='box')
+    # plt.draw()
     # plt.show()
 
     print(negative_surface)
@@ -119,7 +119,7 @@ def newtonRaphson(f, x0, e, N, h, relax):
         # if g(f,buildingno,x0,h)<0:
         #     x1=x1/relax
 
-        if abs(newvalue) < e:
+        if abs(np.max(newvalue)) < e:
             condition = False
         if step > N:
             print('\nNot Convergent.')
@@ -129,14 +129,18 @@ def newtonRaphson(f, x0, e, N, h, relax):
         print('x1---', x1)
 
     if flag == 1:
-        print('\nRequired root is: %0.8f' % x1)
+        print('\nRequired root is: %0.8f' , x1)
         return x0, i, x1
     else:
         print('\nNot Convergent.')
         return 1000, i
 
-x1 = newtonRaphson(f,0.4,0.01,1000, 0.01, 0)[2]
+x1 = newtonRaphson(f,0.4,0.001,1000, 0.01, 0.5)[2]
 Cri =  2 * S / ((taper_outer*x1+x1)*b_outer+(x1+1)*b_inner)
+
+plt.plot(b_inner,Cri, label='Inner wing')
+plt.plot(b_inner,x1, label='Inner wing')
+plt.show()
 
 print("b_outer: ",b_outer)
 print("b_inner: ",b_inner)
