@@ -11,8 +11,8 @@ Wing_loading= 2409 #Wing Loading [N/m^2]
 S=MTOW*g/Wing_loading #Total Surface
 AR = 6 #Aspect ratio
 b = np.sqrt(S*AR) # outer wing wingspan [m]
-V_bat  = 13.5 # Battery Volume [m^3]
-V_body = 7 # Battery Volume [m^3]
+V_bat  = 20 # Battery Volume [m^3]
+V_body = 2 # Battery Volume [m^3]
 V_tot = V_bat + V_body #Total Volume [m^3]
 
 
@@ -20,7 +20,7 @@ V_tot = V_bat + V_body #Total Volume [m^3]
 taper_outer=0.267354977
 sweep_inner=np.deg2rad(38)
 sweep_outer=np.deg2rad(38)
-b_inner=np.arange(0.1,0.65,0.05)*b
+b_inner=0.4*b #np.arange(0.1,0.65,0.05)*b
 b_outer=b-b_inner
 
 ''' Arifoil Properties '''
@@ -134,6 +134,7 @@ def newtonRaphson(f, x0, e, N, h, relax):
     else:
         print('\nNot Convergent.')
         return 1000, i
+
 
 x1 = newtonRaphson(f,0.4,0.001,1000, 0.01, 0.5)[2]
 Cri =  2 * S / ((taper_outer*x1+x1)*b_outer+(x1+1)*b_inner)
