@@ -5,7 +5,9 @@ import matplotlib.pyplot as plt
 import math
 '''Inputs'''
 
-S=50 #Total Surface
+MTOW= 1000 #Maximum Take Off Weight [kg]
+Wing_loading= 100 #Wing Loading [N/m^2]
+S=MTOW/Wing_loading #Total Surface
 AR = 6 #Aspect ratio
 b = np.sqrt(S*AR) # outer wing wingspan [m]
 V_bat  = 7 # Battery Volume [m^3]
