@@ -72,7 +72,7 @@ def airfoilvolume(file_path):
     ax = plt.gca()
     ax.set_aspect('equal', adjustable='box')
     plt.draw()
-    plt.show()
+    # plt.show()
 
     print(negative_surface)
     print(postive_surface)
@@ -137,11 +137,14 @@ Cri =  2 * S / ((taper_outer*x1+x1)*b_outer+(x1+1)*b_inner)
 
 print("b_outer: ",b_outer)
 print("b_inner: ",b_inner)
+print("b: ",b)
+print("taper_inner: ",x1)
+print("taper_outer: ",taper_outer)
 print("cr_inner: ",Cri)
 print("cr_outer: ",x1*Cri)
 print("ct_outer: ",x1*Cri*taper_outer)
 print("Offset inner: ",Cri*0.25-x1*Cri*0.25 + np.tan(sweep_inner)*b_inner/2)
-print("Offset outer: ",Cri*0.25-x1*Cri*0.25 + np.tan(sweep_outer)*b_outer/2+np.tan(sweep_inner)*b_inner/2-x1*Cri*taper_outer*0.25+x1*Cri*0.25 )
+print("Offset outer: ",Cri*0.25-x1*Cri*taper_outer*0.25 + np.tan(sweep_outer)*b_outer/2+ np.tan(sweep_inner)*b_inner/2)
 
 
 
