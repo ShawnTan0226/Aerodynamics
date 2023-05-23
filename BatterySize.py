@@ -5,9 +5,10 @@ import matplotlib.pyplot as plt
 import math
 '''Inputs'''
 
-MTOW= 1000 #Maximum Take Off Weight [kg]
-Wing_loading= 100 #Wing Loading [N/m^2]
-S=MTOW/Wing_loading #Total Surface
+g=9.81 #Gravitational acceleration [m/s^2]
+MTOW= 20320 #Maximum Take Off Weight [kg]
+Wing_loading= 2549 #Wing Loading [N/m^2]
+S=MTOW*g/Wing_loading #Total Surface
 AR = 6 #Aspect ratio
 b = np.sqrt(S*AR) # outer wing wingspan [m]
 V_bat  = 7 # Battery Volume [m^3]
