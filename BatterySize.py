@@ -11,8 +11,8 @@ Wing_loading= 2409 #Wing Loading [N/m^2]
 S=MTOW*g/Wing_loading #Total Surface
 AR = 6 #Aspect ratio
 b = np.sqrt(S*AR) # outer wing wingspan [m]
-V_bat  = 7.5 # Battery Volume [m^3]
-V_body = 2 # Battery Volume [m^3]
+V_bat  = 13.5 # Battery Volume [m^3]
+V_body = 7 # Battery Volume [m^3]
 V_tot = V_bat + V_body #Total Volume [m^3]
 
 
