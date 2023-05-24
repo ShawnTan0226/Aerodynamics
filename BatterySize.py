@@ -159,7 +159,7 @@ print("Offset outer: ",Cri*0.25-x1*Cri*taper_outer*0.25 + np.tan(sweep_outer)*b_
 
 
 class Planform_calculation:
-    def __init__(self, file_path,MTOW,Wing_loading,V_bat,V_body,b_frac,AR=6,sweep_inner=np.deg2rad(38),sweep_outer=np.deg2rad(38),taper_outer=0.267354977):
+    def __init__(self,file_path_i,file_path_o,MTOW,Wing_loading,V_bat,V_body,b_frac,AR=6,sweep_inner=np.deg2rad(38),sweep_outer=np.deg2rad(38),taper_outer=0.267354977):
         self.g=9.81 #Gravitational acceleration [m/s^2]
         self.MTOW= MTOW #Maximum Take Off Weight [kg]
         self.Wing_loading= Wing_loading #Wing Loading [N/m^2]
@@ -178,9 +178,8 @@ class Planform_calculation:
         self.b_inner=b_frac*b #np.arange(0.1,0.65,0.05)*b
         self.b_outer=b-b_inner
 
-        self.file_path = file_path
-        self.Area_inner=self.airfoilvolume(file_path)
-        self.Area_outer=self.airfoilvolume(file_path)
+        self.Area_inner=self.airfoilvolume(file_path_i)
+        self.Area_outer=self.airfoilvolume(file_path_o)
 
     def airfoilvolume(self,file_path):
         # Initialize empty arrays for positive and negative values

@@ -22,8 +22,8 @@ class Plane:
             self.offset=np.concatenate((self.offset, [nextoffset]))
             count+=1
         
-        coords_bot=self.offset+self.c
-        self.coords=np.concatenate((self.coords,self.offset,coords_bot[::-1]))
+        self.coords_bot=self.offset+self.c
+        self.coords=np.concatenate((self.coords,self.offset,self.coords_bot[::-1]))
         self.coords=np.concatenate((self.coords,self.coords[::-1]))
         negative=np.concatenate((-self.b,-self.b[::-1]))[::-1]
 
@@ -43,7 +43,7 @@ class Plane:
         print('b: ',self.b)
         print('offset: ',self.offset)
         return xflr
-    def drawbox(self):
+    def drawbox(self,alpha):
         frontbox=self.offset+0.15*self.c
         backbox=self.offset+0.65*self.c
         x_store=np.concatenate((frontbox,backbox[::-1]))
@@ -57,13 +57,30 @@ class Plane:
         x_red2=np.concatenate((self.offset+self.c,backbox[::-1]))
         x_red2=np.concatenate((x_red2,x_red2[::-1]))
 
-
         plt.plot(self.bfull,self.coords, color='black')
         plt.gca().invert_yaxis()
-        plt.fill(y,x_store, color='blue', alpha=1)
-        plt.fill(y,x_red, color='red', alpha=1)
-        plt.fill(y,x_red2, color='red', alpha=1)
+        plt.fill(y,x_store, color='blue', alpha=alpha, label='Battery')
+        plt.fill(y,x_red, color='orange', alpha=alpha)
+        plt.fill(y,x_red2, color='orange', alpha=alpha)
         plt.show()
+
+    def drawtail(self,alpha):
+        x_front=self.offset[-2:]
+        x_back=self.coords_bot[-2:]
+        x=np.concatenate((x_front,x_back[::-1]))
+        y=np.concatenate((self.b[-2:],self.b[-2:][::-1]))
+        negy=-y
+
+        plt.plot(self.bfull,self.coords, color='black')
+        plt.plot([self.b[-2],self.b[-2]],[self.offset[-2],self.coords_bot[-2]],  color='black')
+        plt.plot([-self.b[-2],-self.b[-2]],[self.offset[-2],self.coords_bot[-2]],  color='black')
+
+        plt.gca().invert_yaxis()
+        plt.fill(self.bfull,self.coords, color='blue', alpha=alpha)
+        plt.fill(y,x, color='orange', alpha=1)
+        plt.fill(negy,x, color='orange', alpha=1)
+        plt.show()
+        
     def MAC_part(self,cr, ct, sweep, b):
         #MAC
         y = 2/3 * (cr + ct - (cr*ct)/(cr+ct))
@@ -87,4 +104,5 @@ class Plane:
         self.MAC = np.sum((self.MAC_list*self.S_list))/np.sum(self.S_list)
         self.x_quarter = np.sum(self.x_list*self.S_list)/np.sum(self.S_list)
         return self.MAC, self.x_quarter
+    
 
