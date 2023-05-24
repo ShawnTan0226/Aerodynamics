@@ -11,6 +11,7 @@ class Plane:
         self.coords=np.array([])
 
         self.draw()
+        self.MAC_aircraft()
 
     def draw(self):
         self.offset=np.array([0])
@@ -57,17 +58,17 @@ class Plane:
         x_red2=np.concatenate((x_red2,x_red2[::-1]))
 
 
-        plt.plot(self.bfull,self.coords)
+        plt.plot(self.bfull,self.coords, color='black')
         plt.gca().invert_yaxis()
-        # plt.fill(y,x_store, color='blue', alpha=0.5)
-        plt.fill(y,x_red, color='red', alpha=0.5)
-        plt.fill(y,x_red2, color='red', alpha=0.5)
+        plt.fill(y,x_store, color='blue', alpha=1)
+        plt.fill(y,x_red, color='red', alpha=1)
+        plt.fill(y,x_red2, color='red', alpha=1)
         plt.show()
     def MAC_part(self,cr, ct, sweep, b):
         #MAC
         y = 2/3 * (cr + ct - (cr*ct)/(cr+ct))
         #offset from that parts root on quarter chord
-        off_x = (b/2/(ct-cr))*(y-ct)
+        off_x = -(b/2/(ct-cr))*(y-ct)
         off_y = cr*0.25-ct*0.25 + np.tan(sweep)*off_x
         return y, off_x, off_y
 
@@ -78,17 +79,12 @@ class Plane:
         for i in range(len(self.taper)):
             part= self.MAC_part(self.c[i],self.c[i+1],self.sweep[i],self.b[i+1])
             self.MAC_list=np.concatenate((self.MAC_list,[part[0]]))
-            self.S_list=np.concatenate((self.S_list,[(self.c[i]+self.c[i+1])/2*self.b[i+1]]))
+            self.S_list=np.concatenate((self.S_list,[(self.c[i]+self.c[i+1])/2*(self.b[i+1]-self.b[i])]))
             self.x_list=np.concatenate((self.x_list,[part[1]]))
 
     def MAC_aircraft(self):#Make sure to use numpy array
         self.listgenerator()
         self.MAC = np.sum((self.MAC_list*self.S_list))/np.sum(self.S_list)
-        self.x_quarter = np.sum(self.x_list)/np.sum(self.S_list)
+        self.x_quarter = np.sum(self.x_list*self.S_list)/np.sum(self.S_list)
         return self.MAC, self.x_quarter
 
-test=Plane(9.72,[0.3,0.267],[38,38],[8.82,22])
-# test.plot_plane()
-test.xflrvelues()
-test.drawbox()
-print(test.MAC_aircraft())
