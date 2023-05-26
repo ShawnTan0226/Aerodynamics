@@ -13,8 +13,8 @@ Wing_loading= 2409 #Wing Loading [N/m^2]
 S=MTOW*g/Wing_loading #Total Surface
 AR = 6 #Aspect ratio
 b = np.sqrt(S*AR) # outer wing wingspan [m]
-V_bat  = 50 # Battery Volume [m^3]
-V_body = 2 # Battery Volume [m^3]
+V_bat  = 20.5 # Battery Volume [m^3]
+V_body = 0.25*V_bat # Battery Volume [m^3]
 V_tot = V_bat + V_body #Total Volume [m^3]
 
 
@@ -164,12 +164,12 @@ class Planform_calculation:
         self.g=9.81 #Gravitational acceleration [m/s^2]
         self.MTOW= MTOW #Maximum Take Off Weight [kg]
         self.Wing_loading= Wing_loading #Wing Loading [N/m^2]
-        self.S=MTOW*g/Wing_loading #Total Surface
+        self.S=MTOW*self.g/self.Wing_loading #Total Surface
         self.AR = AR #Aspect ratio
         b = np.sqrt(self.S*AR) # outer wing wingspan [m]
         self.V_bat  = V_bat # Battery Volume [m^3]
         self.V_body = V_frac*V_bat # Battery Volume [m^3]
-        self.V_tot = V_bat + V_body #Total Volume [m^3]
+        self.V_tot = self.V_bat + self.V_body #Total Volume [m^3]
 
 
 
@@ -177,7 +177,7 @@ class Planform_calculation:
         self.sweep_inner=sweep_inner
         self.sweep_outer=sweep_outer
         self.b_inner=b_frac*b #np.arange(0.1,0.65,0.05)*b
-        self.b_outer=b-b_inner
+        self.b_outer=b-self.b_inner
 
         self.Area_inner=self.airfoilvolume(file_path_i)
         self.Area_outer=self.airfoilvolume(file_path_o)
@@ -260,8 +260,8 @@ class Planform_calculation:
             #     break
             print('x0---', x0)
             print('value---', f(x0))
-            print('grad---', gradient(f, x0, h))
-            x1 = x0 * relax + (x0 - f(x0) / (gradient(f, x0, h))) * (1 - relax)
+            print('grad---', self.gradient(f, x0, h))
+            x1 = x0 * relax + (x0 - f(x0) / (self.gradient(f, x0, h))) * (1 - relax)
             # print('Iteration-%d, x1 = %0.6f and f(x1) = %0.6f' % (step, x1, f(x1)))
             x0 = x1
             step = step + 1

@@ -109,7 +109,7 @@ class Plane:
     def MAC_aircraft(self):#Make sure to use numpy array
         self.listgenerator()
         self.MAC = np.sum((self.MAC_list*self.S_list))/np.sum(self.S_list)
-        self.x_quarter = np.sum(self.x_list*self.S_list)/np.sum(self.S_list)
+        self.x_quarter = np.sum(self.x_list)/np.sum(self.S_list)
         return self.MAC, self.x_quarter
     def define_airfoil(self,file_path):
         # Initialize empty arrays for positive and negative values
@@ -168,28 +168,30 @@ class Plane:
     
     def atmos(self):
         self.T=288.15-0.0065*self.h
-        self.rho=1.225*(self.T/288.15)**(-1-9.81/(287.058*0.0065))
-        self.nu=1.7894e-5
+        self.rho=1.225*(self.T/288.15)**(-1+9.81/(287.058*0.0065))
+        self.nu=0.0000169
 
     def aerodynamic_properties(self):
         self.atmos()
         self.Re=self.rho*self.V*self.MAC/self.nu
+        self.Re_list=self.rho*self.V*self.MAC_list/self.nu
         self.a=np.sqrt(1.4*287.058*self.T)
         self.M=self.V/self.a
     
-    def define_C_f(self,laminar_frac):
-        C_f_laminar=1.328/np.sqrt(self.Re)
-        C_f_turbulent=0.455/(np.log10(self.Re)**2.58*(1+0.144*self.M**2))
+    def define_C_f(self,laminar_frac,part):
+        C_f_laminar=1.328/np.sqrt(self.Re_list[part])
+        C_f_turbulent=0.455/((np.log10(self.Re_list[part]))**2.58*(1+0.144*self.M**2))
         C_f_total=laminar_frac*C_f_laminar+(1-laminar_frac)*C_f_turbulent
+        print('C_f_total',C_f_total)
         return C_f_total
+    
     def define_C_D_part_wing(self,laminar_frac,part):
         #modern blended winglet IF= 1-1.01, so IF can be neglected
-        C_f=self.define_C_f(laminar_frac)
-        FF=(1+0.6/self.max_thickness_location*self.max_thickness+100*(self.max_thickness)**(4))*(1.34*self.M**0.18*(np.cos(np.deg2rad(self.sweep[part])))**0.28)
+        C_f=self.define_C_f(laminar_frac,part)
+        FF=(1+0.6/self.max_thickness_location*self.max_thickness+100*(self.max_thickness)**(4))*(1.34*self.M**0.18*(np.cos(self.sweep[part]))**0.28)
+        print('FF',FF)
         S_wet=2*self.S_list[part]*1.07
         C_D_part=FF*C_f*S_wet/self.S
-        print(C_D_part)
-
         return C_D_part
     
     def define_C_D_0(self,laminar_frac):
