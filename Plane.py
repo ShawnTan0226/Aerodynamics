@@ -25,6 +25,7 @@ class Plane:
         for i in self.taper:
             self.c=np.concatenate((self.c, [i*self.c[-1]]))
             nextoffset=self.offset[-1]+np.tan(self.sweep[count])*(self.b[count+1]-self.b[count])/2+0.25*self.c[-2]-0.25*self.c[-1]
+            print('sweep',self.sweep[count])
             self.offset=np.concatenate((self.offset, [nextoffset]))
             self.S_list=np.concatenate((self.S_list,[(self.c[-1]+self.c[-2])/2*(self.b[count+1]-self.b[count])]))
             count+=1
@@ -39,7 +40,8 @@ class Plane:
         self.bfull=np.concatenate((self.b,self.b[::-1],negative))
 
     def plot_plane(self):
-        plt.plot(self.bfull,self.coords)
+        plt.plot(self.bfull,self.coords,color='black')
+        plt.fill(self.bfull,self.coords, color='gray', alpha=0.5)
         plt.gca().invert_yaxis()
         plt.show()
 
@@ -202,3 +204,11 @@ class Plane:
 
     
 
+
+test=Plane(5.8,[0.267],[38],[22])
+print(test.S)
+test.plot_plane()
+test.xflrvelues()
+# test.drawbox(0.5)
+test.drawtail(0.2)
+print(test.MAC_aircraft())

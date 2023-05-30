@@ -181,6 +181,7 @@ class Planform_calculation:
 
         self.Area_inner=self.airfoilvolume(file_path_i)
         self.Area_outer=self.airfoilvolume(file_path_o)
+        self.flying_wing=False
 
 
     def airfoilvolume(self,file_path):
@@ -284,15 +285,23 @@ class Planform_calculation:
             return x0, i, x1
         else:
             print('\nNot Convergent.')
-            return 1000, i
+            return 1000, i, "No solution found"
     
     def solve_equation(self):
-        x1 = self.newtonRaphson(self.f,0.4,0.001,1000, 0.01, 0.5)[2]
-        self.Cri =  2 * self.S / ((self.taper_outer*x1+x1)*self.b_outer+(x1+1)*self.b_inner)
-        self.taper_inner = x1
-        return self.Cri,x1
+        x1 = self.newtonRaphson(self.f,0.4,0.001,100, 0.01, 0.5)[2]
+        if x1=="No solution found":
+            self.flying_wing=True
+            self.Cri=2 * self.S / ((self.taper_outer+1)*(self.b_outer+self.b_inner))
+
+            return x1
+        else:
+            self.Cri =  2 * self.S / ((self.taper_outer*x1+x1)*self.b_outer+(x1+1)*self.b_inner)
+            self.taper_inner = x1
     
     def makeplane(self):
         self.solve_equation()
-        self.plane=Plane(self.Cri,[self.taper_inner,self.taper_outer],[self.sweep_inner,self.taper_outer],[self.b_inner,self.b_outer+self.b_inner])
+        if self.flying_wing==False:
+            self.plane=Plane(self.Cri,[self.taper_inner,self.taper_outer],[np.rad2deg(self.sweep_inner),np.rad2deg(self.sweep_outer)],[self.b_inner,self.b_outer+self.b_inner])
+        elif self.flying_wing==True:
+            self.plane=Plane(self.Cri,[self.taper_outer],[np.rad2deg(self.sweep_outer)],[self.b_inner+self.b_outer])
         
