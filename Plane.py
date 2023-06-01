@@ -106,23 +106,26 @@ class Plane:
         #MAC
         y = 2/3 * (cr + ct - (cr*ct)/(cr+ct))
         #offset from that parts root on quarter chord
-        off_x = -(b/2/(ct-cr))*(y-ct)
-        off_y = cr*0.25-ct*0.25 + np.tan(sweep)*off_x
+        off_x = -(b/2)*(y-cr)/(cr-ct) #b is the span of that part of the wing
+        off_y = np.tan(sweep)*off_x
         return y, off_x, off_y
 
     def listgenerator(self):
         self.MAC_list=np.array([])
         self.x_list=np.array([])
+        self.y_list = np.array([])
         for i in range(len(self.taper)):
-            part= self.MAC_part(self.c[i],self.c[i+1],self.sweep[i],self.b[i+1])
+            part= self.MAC_part(self.c[i],self.c[i+1],self.sweep[i],self.b[i+1]-self.b[i])
             self.MAC_list=np.concatenate((self.MAC_list,[part[0]]))
-            self.x_list=np.concatenate((self.x_list,[part[1]]))
+            self.x_list=np.concatenate((self.x_list,[part[1]]+self.offset[i]+0.25*self.c[i]))
+            self.y_list = np.concatenate((self.y_list, [part[2]]+self.b[i]))
 
     def MAC_aircraft(self):#Make sure to use numpy array
         self.listgenerator()
-        self.MAC = np.sum((self.MAC_list*self.S_list))/np.sum(self.S_list)
-        self.x_quarter = np.sum(self.x_list)/np.sum(self.S_list)
-        return self.MAC, self.x_quarter
+        self.MAC = np.sum(self.MAC_list*self.S_list)/np.sum(self.S_list)
+        self.x_quarter = np.sum(self.x_list*self.S_list)/np.sum(self.S_list)
+        self.y_quarter = np.sum(self.y_list*self.S_list)/np.sum(self.S_list)
+
     
     def define_airfoil(self,file_path):
         # Initialize empty arrays for positive and negative values
@@ -217,7 +220,7 @@ class Plane:
     
 
 
-test=Plane(5.8,[0.267],[38],[22])
+test=Plane(5.8,[0.267,0.34],[38,38],[22,25])
 print(test.S)
 test.plot_plane()
 test.xflrvelues()
