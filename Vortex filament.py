@@ -24,6 +24,8 @@ class Wingmodelling:
         self.rho=1.225
         self.V=110
 
+        self.step=step
+
         self.get_c()
         self.get_aoa(aoa)
 
@@ -90,54 +92,70 @@ class Wingmodelling:
         tempdGdy=np.copy(self.dGdy)
         tempy=np.copy(self.y)
         offset=0.0001
-        for i in range(len(tempy)):
-            if tempy[i]==y:
-                tempy=np.delete(tempy,i)
-                tempy=np.insert(tempy,i,np.array([self.y[i]-offset,self.y[i]+offset]))
-                if i==0:
-                    tempy=np.delete(tempy,0)
-                elif i==len(self.y)-1:
-                    tempy=np.delete(tempy,-1)
-                else:
-                    tempdGdy=np.insert(tempdGdy,i,tempdGdy[i])
-                singularity=i
-        f=tempdGdy/(y-tempy)
-        ai=1/(4*np.pi*self.V)*np.trapz(f,tempy)
+        # for i in range(len(tempy)):
+        #     if tempy[i]==y:
+        #         tempy=np.delete(tempy,i)
+        #         tempy=np.insert(tempy,i,np.array([self.y[i]-offset,self.y[i]+offset]))
+        #         if i==0:
+        #             tempy=np.delete(tempy,0)
+        #         elif i==len(self.y)-1:
+        #             tempy=np.delete(tempy,-1)
+        #         else:
+        #             tempdGdy=np.insert(tempdGdy,i,tempdGdy[i])
+        #         singularity=i
+        midstart=int(len(self.Gamma)/2-1)
+
+        dG=self.Gamma[:midstart+1]-np.concatenate(([0],self.Gamma[:midstart]))
+        dG=np.concatenate((dG,-dG[::-1]))
+        singularity=np.where(tempy==y)[0][0]
+        f1=dG[:singularity]/(y-tempy[:singularity])
+        f2=dG[singularity+1:]/(y-tempy[singularity+1:])
+        f=np.concatenate((f1,f2))
+
+        plt.plot(tempy[:-1],f)
+        plt.show()
+
+        ai=1/(4*np.pi*self.V)*np.sum(f)
         return np.arctan(ai)
 
 
     def iterate_CL(self):
         self.cl=self.get_cl(self.geomaoa)*np.sqrt((1-(self.y/(self.b/2))**2))
         self.Gamma=self.cl*self.c*0.5*self.V
+        # plt.plot(self.y,self.Gamma)
         ai=np.zeros(len(self.y))
         aiold=0
         # plt.plot(self.y,self.Gamma)
         error=10
-        count=0
+        self.count=0
         while np.abs(error)>=0.001:
             self.dGdy=self.differentiation(self.Gamma,self.y)
-            print('Iteration: ',count+1)
+            print('Iteration: ',self.count+1)
+            self.integ=1
             for i in range(len(self.y)):
                 y0=self.y[i]
                 induced_aoa_y0=self.calc_induced(y0)
                 ai[i]=induced_aoa_y0
+                self.integ=i
 
-            self.aoa=self.geomaoa+ai
+            ai[ai<0]=0
+            self.aoa=self.geomaoa-ai
             self.cl=self.get_cl(self.aoa)
 
             error=np.mean(np.abs(aiold-ai))
+            # print(ai-aiold)
             aiold=np.copy(ai)
 
             self.Gammanew=self.cl*self.c*0.5*self.V
             self.Gammanew[0],self.Gammanew[-1]=0,0
             self.Gamma+=0.05*(self.Gammanew-self.Gamma)
 
-            plt.plot(self.y,self.Gamma)
-            plt.plot(self.y,self.Gammanew)
+            # plt.plot(self.y,self.Gammanew)
+            # plt.plot(self.y,self.Gamma)
+            plt.plot(self.y,ai)
             plt.show()
-            # print(ai-aiold)
             
-            count+=1
+            self.count+=1
         self.ai=ai
         self.CL=self.wing_CL()
         return self.CL

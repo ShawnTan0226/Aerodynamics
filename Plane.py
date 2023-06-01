@@ -5,12 +5,14 @@ from scipy.interpolate import interp1d
 
 class Plane:
     def __init__(self,Cri,taper,sweep,b,h=5000,V=110,airfoil=".\Airfoil_dat\MH 91  14.98%.dat"):
-        self.c=np.array([Cri])
-        self.taper = np.array(taper)
-        self.sweep = np.array(np.deg2rad(sweep))
-        self.b = np.concatenate(([0],b))
-        self.coords=np.array([])
-        self.S_list=np.array([])
+        #Plane object has n sections
+        self.c=np.array([Cri]) #array of chord [m] form: [Middle c,c1,c2,c3,...,cn]
+        self.taper = np.array(taper) #array of taper ratio form: [taper1,taper2,taper3,...,tapern]
+        self.sweep = np.array(np.deg2rad(sweep)) #array of sweep angle [rad] form: [sweep1,sweep2,sweep3,...,sweepn]
+        self.b = np.concatenate(([0],b)) #array of span [m] form: [0,b1,b2,b3,...,bn]
+        self.S_list=np.array([]) #array of surface area of each section [m^2] form: [S1,S2,S3,...,Sn]
+        
+        self.coords=np.array([]) 
         self.V=V
         self.h=h
 
@@ -18,6 +20,14 @@ class Plane:
         self.MAC_aircraft()
         self.define_airfoil(airfoil)
         self.aerodynamic_properties()
+
+    def help(self):
+        print('Visual of top view of plane with plot_plane() \n ',
+              'Get the xflr inputs with xflrvelues() \n ',
+              'Plot plane with payload area with drawbox(opacity) \n ',
+              'Plot plane with tail area with drawtail(opacity) \n ',
+              'Get the MAC and x_quarter with MAC_aircraft() \n ',
+              'Get the C_D_0 with define_C_D_0(laminar_frac) \n ',)
 
     def draw(self):
         self.offset=np.array([0])
@@ -113,6 +123,7 @@ class Plane:
         self.MAC = np.sum((self.MAC_list*self.S_list))/np.sum(self.S_list)
         self.x_quarter = np.sum(self.x_list)/np.sum(self.S_list)
         return self.MAC, self.x_quarter
+    
     def define_airfoil(self,file_path):
         # Initialize empty arrays for positive and negative values
         positive_column1 = []
@@ -201,6 +212,7 @@ class Plane:
         for i in range(len(self.taper)):
             self.C_D_0+=self.define_C_D_part_wing(laminar_frac,i)
         self.C_D_0+=0.1*self.C_D_0
+        return self.C_D_0
 
     
 
