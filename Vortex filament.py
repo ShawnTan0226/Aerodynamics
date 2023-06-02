@@ -6,7 +6,18 @@ import matplotlib.pyplot as plt
 from scipy.interpolate import interp1d
 
 
+'''
+The main numerical calculation is at line 102 and line 129, in the function calc_induced and NonlinearNumericalLiftingLine respectively
+The rest is just to initiate the aircraft geometry and airfoil data
 
+Main steps is as follows:
+1. Estimate initial circulation distribution
+2. Calculate induced angle of attack at every point (Differentiation of Gamma or discrete change in circulation dG)
+3. Calculate effective angle of attack with alpha geom- alpha induced (Main problem)
+4. Calculate lift coefficient with effective angle of attack (Main problem)
+5.  Use new lift coefficient to calculate new circulation distribution
+6. Repeat step 2-5
+'''
 
 AR=5
 TR=0.5
@@ -89,9 +100,13 @@ class Wingmodelling:
         return CL
 
     def calc_induced(self,y):
+        
+        '''
+        The commented part is the calculation with the differentiation of Gamma dGdy
+        '''
         tempdGdy=np.copy(self.dGdy)
         tempy=np.copy(self.y)
-        offset=0.0001
+        # offset=0.0001
         # for i in range(len(tempy)):
         #     if tempy[i]==y:
         #         tempy=np.delete(tempy,i)
@@ -105,6 +120,15 @@ class Wingmodelling:
         #         singularity=i
         midstart=int(len(self.Gamma)/2-1)
 
+        '''
+        This is the calculation of induced drag with discrete change in circulation dG without any differentiation.
+        Where dw=dG/(y_n-y)
+        Sum of dw is used to find w
+        I found both methods have the same result so is not the problem
+        y_n is the input variable y here and tempy is the array of y values
+        I excluded y_n=y and put it as 0 to avoid singularity
+        '''
+
         dG=self.Gamma[:midstart+1]-np.concatenate(([0],self.Gamma[:midstart]))
         dG=np.concatenate((dG,-dG[::-1]))
         singularity=np.where(tempy==y)[0][0]
@@ -112,45 +136,70 @@ class Wingmodelling:
         f2=dG[singularity+1:]/(y-tempy[singularity+1:])
         f=np.concatenate((f1,f2))
 
-        plt.plot(tempy[:-1],f)
-        plt.show()
+        # plt.plot(tempy[:-1],f)
+        # plt.show()
 
         ai=1/(4*np.pi*self.V)*np.sum(f)
         return np.arctan(ai)
 
 
-    def iterate_CL(self):
+    def NonlinearNumericalLiftingLine(self):
+
+        #Initialise Gamma guess
         self.cl=self.get_cl(self.geomaoa)*np.sqrt((1-(self.y/(self.b/2))**2))
         self.Gamma=self.cl*self.c*0.5*self.V
-        # plt.plot(self.y,self.Gamma)
+
         ai=np.zeros(len(self.y))
         aiold=0
-        # plt.plot(self.y,self.Gamma)
         error=10
         self.count=0
+
+        '''
+        While loop for numerical iteration
+        '''
         while np.abs(error)>=0.001:
-            self.dGdy=self.differentiation(self.Gamma,self.y)
             print('Iteration: ',self.count+1)
+
+            #Differentiation of Gamma
+            self.dGdy=self.differentiation(self.Gamma,self.y)
+
             self.integ=1
+
+            #Calculate induced angle of attack for every y
             for i in range(len(self.y)):
                 y0=self.y[i]
+
+                #Integration of funcation to get induced angle of attack for each y0
                 induced_aoa_y0=self.calc_induced(y0)
                 ai[i]=induced_aoa_y0
                 self.integ=i
 
+            #Calculate true angle of attack
             ai[ai<0]=0
-            self.aoa=self.geomaoa-ai
+            self.aoa=self.geomaoa-ai  
+            # Main problem is here as ai goes to negative infinity at the tips(-b/2 and b/2). 
+            # Excluding the tips does not work as the points before the tips still have large negative values at the points near the tips
+            # This large negative values is mathematical and not a numerical or programming error(Unless I missed something but I checked it a lot of times)
+            # Large values for the induced angle is also out of the range of c_l of the airfoil
+            # Extrapolation doesn't work as the low c_l means high dGdy values as gradient is high
+            # Negative a_i means negative drag which is odd
+
+
+            #Calculate lift coefficient
             self.cl=self.get_cl(self.aoa)
 
+            '''
+            Error of induced angle of attack
+            '''
             error=np.mean(np.abs(aiold-ai))
             # print(ai-aiold)
             aiold=np.copy(ai)
 
+            #Calculate new circulation distribution with relaxation
             self.Gammanew=self.cl*self.c*0.5*self.V
             self.Gammanew[0],self.Gammanew[-1]=0,0
             self.Gamma+=0.05*(self.Gammanew-self.Gamma)
 
-            # plt.plot(self.y,self.Gammanew)
             # plt.plot(self.y,self.Gamma)
             plt.plot(self.y,ai)
             plt.show()
@@ -174,7 +223,7 @@ class Wingmodelling:
         
 
 Wingtest=Wingmodelling(4,0.5,33,'MH91',5,5)
-CL=Wingtest.iterate_CL()
+CL=Wingtest.NonlinearNumericalLiftingLine()
 CDi=Wingtest.calc_CD()
 print(CL,CDi)
 Wingtest.plot_cl()
